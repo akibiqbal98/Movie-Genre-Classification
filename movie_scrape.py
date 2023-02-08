@@ -7,6 +7,7 @@
 # -------------------------><-----------------
 import re
 import sys
+import json 
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,10 +17,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 
 # def create_driver_and_wait(waiting_time=10):
-
-
 chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument('--headless')
+chrome_options.add_argument('--headless')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 
@@ -27,8 +26,8 @@ chrome_options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(options=chrome_options)
 
 # wait for the page to load
-driver.implicitly_wait(10)
-wait = WebDriverWait(driver, 10)
+driver.implicitly_wait(20)
+wait = WebDriverWait(driver, 20)
 
 # Create an instance of Chrome
 # return driver, wait
@@ -42,45 +41,85 @@ def get_innerHTML(element: WebElement):
     # name = element.find_element(By.CSS_SELECTOR, "div#main h3 a").text
     year = element.find_element(By.CSS_SELECTOR, "div#main h3 span.lister-item-year").text
     # rating = element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text
-
+    
     genre, description = element.find_elements(By.CSS_SELECTOR, 'div#main p.text-muted')
-
+    
     # reg_year = re.search(r"\d{4}", year)
     # print(reg_year.group())
-
+    
     return {
         "Name": element.find_element(By.CSS_SELECTOR, "div#main h3 a").text,
         "Year": re.search(r"\d{4}", year).group(0),
         "Rating": element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text,
-        "Description": description.text,
-        "Genre": genre.find_element(By.CSS_SELECTOR, "span.genre").text.split(",")
+        "Description": description.text , 
+        "Genre": genre.find_element(By.CSS_SELECTOR,"span.genre").text.split(",")
     }
 
 
-def change_page(by, value):
+# def change_page(by, value):#
+#     element: WebElement = wait.until(EC.presence_of_element_located((by, value)))
+#     print(element)
+#     driver.execute_script("arguments[0].click();", element)
+#     sleep(30)
 
-    # find the next button element
-    next_button = driver.find_element_by_css_selector('div#main div#desc a.lister-page-next')
-
-    # click on the next button to go to the next page
-    next_button.click()
-
-    # wait for the page to load
-    time.sleep(2)
-
-
-elements: WebElement = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div#main div.lister-item')))
-
-data = map(get_innerHTML, [elements[:10]])
-
-print(data)
+def change_page():
+    # next page button
+    XPATH = "//div[@id='main']/div[@class='desc']/a[@class='lister-page-next next-page']"
+    element: WebElement = wait.until(EC.presence_of_element_located((By.XPATH, XPATH)))
+    # print(element_.get_attribute("outerHTML"))
+    # element.click()  # Not working
+    driver.execute_script("arguments[0].click();", element) 
 
 
-# tried to make list generator
+# Navigate to a website
+url = 'https://www.imdb.com/search/title/?title_type=feature&release_date=2000-01-01,2023-12-31&user_rating=5.0,&languages=en&count=250'
+driver.get(url)
 
-# data = (d for d in data, d for d in map(get_innerHTML, [*elements[10:20]]))
-# data = (*data, *map(get_innerHTML, [*elements[20:30]]))
+# elements: WebElement = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div#main div.lister-item')))
+# data = list(map(get_innerHTML, elements[:20]))
+# print(data)
 
-# # for d in data:
-# #     print(d)
-# print(sys.getsizeof(data), sys.getsizeof(list(data)), type(data))
+
+all_elements = []
+
+page_no = 2
+
+for indx in range(page_no):
+    while(True):
+        try:
+            elements: WebElement = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div#main div.lister-item')))
+            all_elements.extend(list(map(get_innerHTML, elements[:])))
+        
+        except Exception as e:
+            print(e)
+            continue
+        
+        else:
+            print(len(all_elements))
+            if indx != page_no - 1:
+                change_page()
+                sleep(40) 
+            break
+
+print(all_elements)
+
+# def format_scrappy_data(data: list[tuple]):
+#     return [
+#         {
+#             "Movie Name": a,
+#             "Release Year": b,
+#             "Rating": c,
+#             "Description": d,
+#             "Genre": e,
+#         } for a, b, c, d, e in data
+#     ]
+
+
+# # print formatted data using json to a file
+
+# with open('movie_data.json', 'w') as f:
+#     json.dump(format_scrappy_data(all_elements), f, indent=2)
+
+
+# pause for 10 seconds
+sleep(10)
