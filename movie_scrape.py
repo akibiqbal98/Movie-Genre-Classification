@@ -26,8 +26,8 @@ chrome_options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(options=chrome_options)
 
 # wait for the page to load
-driver.implicitly_wait(20)
-wait = WebDriverWait(driver, 20)
+driver.implicitly_wait(50)
+wait = WebDriverWait(driver, 50)
 
 # Create an instance of Chrome
 # return driver, wait
@@ -82,7 +82,7 @@ driver.get(url)
 
 all_elements = []
 
-page_no = 2
+page_no = 3
 
 for indx in range(page_no):
     while(True):
@@ -98,7 +98,7 @@ for indx in range(page_no):
             print(len(all_elements))
             if indx != page_no - 1:
                 change_page()
-                sleep(40) 
+                sleep(50) 
             break
 
 print(all_elements)
@@ -122,4 +122,4 @@ print(all_elements)
 
 
 # pause for 10 seconds
-sleep(10)
+sleep(50)
