@@ -32,7 +32,7 @@ wait = WebDriverWait(driver, 50)
 # Create an instance of Chrome
 # return driver, wait
 
-driver.get('https://www.imdb.com/search/title/?title_type=feature&release_date=2000-01-01,2023-12-31&user_rating=5.0,&languages=en&count=250')
+# driver.get('https://www.imdb.com/search/title/?title_type=video_game&count=250')
 
 data = []
 
@@ -99,7 +99,7 @@ driver.get(url)
 
 all_elements = []
 
-page_no = 174
+page_no = 133
 
 for indx in range(page_no):
     while(True):
@@ -115,28 +115,28 @@ for indx in range(page_no):
             print(len(all_elements))
             if indx != page_no - 1:
                 change_page(By.CSS_SELECTOR,  'div#main div.desc a.lister-page-next')
-                sleep(10) 
+                sleep(20) 
             break
 
 print(all_elements)
 
-# def format_scrappy_data(data: list[tuple]):
-#     return [
-#         {
-#             "Movie Name": a,
-#             "Release Year": b,
-#             "Rating": c,
-#             "Description": d,
-#             "Genre": e,
-#         } for a, b, c, d, e in data
-#     ]
+def format_scrappy_data(data: list):
+    # print(data)
+    return [
+        {
+            "Movie Name": a['Name'],
+            "Release Year": a['Year'],
+            "Rating": a['Rating'],
+            "Description": a['Description'],
+            "Genre": a['Genre'],
+        } for a in data
+    ]
 
+# print formatted data using json to a file
 
-# # print formatted data using json to a file
-
-# with open('movie_data.json', 'w') as f:
-#     json.dump(format_scrappy_data(all_elements), f, indent=2)
+with open('all_movie_data.json', 'w') as f:
+    json.dump(format_scrappy_data(all_elements), f, indent=2)
 
 
 # pause for 10 seconds
-sleep(50)
+sleep(30)
