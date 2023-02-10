@@ -55,28 +55,58 @@ def create_driver_and_wait(waiting_time=10):
 
 
 def get_innerHTML(element: WebElement):
-    name = element.find_element(By.CSS_SELECTOR, "div#main h3 a").text
-    year = element.find_element(By.CSS_SELECTOR, "div#main h3 span.lister-item-year").text
-    # rating = element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text
+    # name = element.find_element(By.CSS_SELECTOR, "div#main h3 a").text
+    # year = element.find_element(By.CSS_SELECTOR, "div#main h3 span.lister-item-year").text
+    # # rating = element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text
     
-    genre, description = element.find_elements(By.CSS_SELECTOR, 'div#main p.text-muted')
     
     # reg_year = re.search(r"\d{4}", year)
     # print(reg_year.group())
     try:
+        name = element.find_element(By.CSS_SELECTOR, "div#main h3 a").text
+    
+    except Exception  as e:
+        # print(e)
+        name = None
+   
+    try:
+        year = element.find_element(By.CSS_SELECTOR, "div#main h3 span.lister-item-year").text
+        year = re.search(r"\d{4}", year).group(0)
+   
+    except Exception  as e:
+        # print(e)
+        year = None
+       
+    try:
+        rating = element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text
+        # year = re.search(r"\d{4}", year).group(0)
+    
+    except Exception  as e:
+        # print(e)
+        rating = None
+    
+    genre, description = element.find_elements(By.CSS_SELECTOR, 'div#main p.text-muted')
+    
+    try:
+        description = description.text 
+        
+    except Exception  as e:
+        # print(e)
+        description = None
+    
+    try:    
         genre = genre.find_element(By.CSS_SELECTOR,"span.genre").text.split(",")
-
+        
     except Exception  as e:
         # print(e)
         genre = None
     
     return {
-            "Name": element.find_element(By.CSS_SELECTOR, "div#main h3 a").text,
-            "Year": re.search(r"\d{4}", year).group(0),
-            "Rating": element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text,
-            "Description": description.text , 
+            "Name": name,
+            "Year": year,
+            "Rating": rating,
+            "Description": description , 
             "Genre": genre
-            
         }
 
 
@@ -95,7 +125,7 @@ def change_page(by, value):
 
 
 # Navigate to a website
-url = 'https://www.imdb.com/search/title/?title_type=feature&release_date=2000-01-01,2023-12-31&user_rating=5.0,&languages=en&count=250'
+url = 'https://www.imdb.com/search/title/?title_type=feature&release_date=2000-01-01,&user_rating=5.0,&languages=en&count=250&start=8800&ref_=adv_nxt'
 driver.get(url)
 
 # elements: WebElement = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div#main div.lister-item')))
@@ -105,7 +135,7 @@ driver.get(url)
 
 all_elements = []
 
-page_no = 35
+page_no = 54
 
 for indx in range(page_no):
     while(True):
@@ -124,7 +154,7 @@ for indx in range(page_no):
                 sleep(20) 
             break
 
-print(all_elements)
+# print(all_elements)
 
 def format_scrappy_data(data: list):
     # print(data)
@@ -140,7 +170,7 @@ def format_scrappy_data(data: list):
 
 # print formatted data using json to a file
 
-with open('all_movie_data.json', 'w') as f:
+with open('new_all_movie_data.json', 'w') as f:
     json.dump(format_scrappy_data(all_elements), f, indent=2)
 
 
