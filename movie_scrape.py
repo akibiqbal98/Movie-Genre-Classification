@@ -55,7 +55,7 @@ def create_driver_and_wait(waiting_time=10):
 
 
 def get_innerHTML(element: WebElement):
-    # name = element.find_element(By.CSS_SELECTOR, "div#main h3 a").text
+    name = element.find_element(By.CSS_SELECTOR, "div#main h3 a").text
     year = element.find_element(By.CSS_SELECTOR, "div#main h3 span.lister-item-year").text
     # rating = element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text
     
@@ -63,15 +63,21 @@ def get_innerHTML(element: WebElement):
     
     # reg_year = re.search(r"\d{4}", year)
     # print(reg_year.group())
+    try:
+        genre = genre.find_element(By.CSS_SELECTOR,"span.genre").text.split(",")
+
+    except Exception  as e:
+        # print(e)
+        genre = None
     
     return {
-        "Name": element.find_element(By.CSS_SELECTOR, "div#main h3 a").text,
-        "Year": re.search(r"\d{4}", year).group(0),
-        "Rating": element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text,
-        "Description": description.text , 
-        "Genre": genre.find_element(By.CSS_SELECTOR,"span.genre").text.split(",")
-        
-    }
+            "Name": element.find_element(By.CSS_SELECTOR, "div#main h3 a").text,
+            "Year": re.search(r"\d{4}", year).group(0),
+            "Rating": element.find_element(By.CSS_SELECTOR, "div#main div.ratings-bar strong").text,
+            "Description": description.text , 
+            "Genre": genre
+            
+        }
 
 
 def change_page(by, value):
@@ -99,7 +105,7 @@ driver.get(url)
 
 all_elements = []
 
-page_no = 133
+page_no = 35
 
 for indx in range(page_no):
     while(True):
